@@ -95,7 +95,7 @@ for filename in os.listdir('./train/video'):
                 fft_cnt=0;
                 fft_size=len(normalize_data)
                 result=[]
-                while (fft_cnt)*fft_step<fft_size and (not all_fft or (all_fft and fft_cnt<len(all_fft[0][0]))):
+                while (fft_cnt)*fft_step<fft_size and (fft_cnt<23):
                     fft_reuslt = fft(x=normalize_data[fft_cnt*fft_step:(fft_cnt+1)*fft_step],n=fft_step) 
                     result.append(abs(fft_reuslt).tolist())
                     fft_cnt+=1

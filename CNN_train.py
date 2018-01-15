@@ -10,11 +10,11 @@ def main(unused_argv):
     train_data = fft  
     train_labels = landmarks
 
-    speech_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="./record")
+    speech_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="./CNN_record")
     tensors_to_log = {}
     logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
 
-    train_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x":train_data},y=train_labels,batch_size=300,num_epochs=300,shuffle=False)
+    train_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x":train_data},y=train_labels,batch_size=300,num_epochs=200,shuffle=False)
     speech_classifier.train(input_fn=train_input_fn,steps=20000,hooks=[logging_hook])
 
 

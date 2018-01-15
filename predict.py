@@ -6,7 +6,14 @@ from CNN import cnn_model_fn
 import sys
 import tkinter
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+import imageio
+import os
+import warnings
 
+warnings.filterwarnings("ignore")
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 def main(argv):
 
@@ -64,27 +71,38 @@ def main(argv):
         sys.exit(2)
 
     print("Read Speech File Finished. Predicting ... ")
-    speech_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="./record")
-    tensors_to_log = {}
-    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
+    speech_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="./CNN_record")
 
     cnn_input=np.array(all_fft,dtype=np.float32)
 
+    output_landmarks=[]
+    writer=imageio.get_writer('./landmarks.gif', mode='I',fps=24) 
     figure_cnt=1
     for speech_fft in cnn_input:
         predict_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x":speech_fft},shuffle=False)
         predict_result= list(speech_classifier.predict(input_fn=predict_input_fn))
         landmarks=predict_result[0]["classes"].tolist()
+        output_landmarks.append(landmarks)
         landmarks_x=[]
         landmarks_y=[]
         for cnt in range(0,136,2):
             landmarks_x.append(landmarks[cnt])
             landmarks_y.append(-landmarks[cnt+1])
-        plt.figure(figure_cnt)
+        fig=plt.figure(figure_cnt)
         plt.plot(landmarks_x,landmarks_y,'o')
-        plt.show()
-
-    print("Predicting ... ")
+        canvas = FigureCanvas(fig)
+        ax = fig.gca()
+        ax.axis('off')
+        canvas.draw()
+        ncols, nrows = canvas.get_width_height()
+        image = np.fromstring(canvas.tostring_rgb(), dtype='uint8').reshape(nrows, ncols, 3)
+        fig.savefig("./predict_landmark/predict"+str(figure_cnt)+".png")
+        writer.append_data(image)
+        figure_cnt+=1
+        # plt.show()
+    writer.close()
+    np.save('./predict_landmark.npy',np.array(output_landmarks,dtype=np.float32))
+    print("Landmark Prediction Finished")
 
 
 if __name__ == "__main__":

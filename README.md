@@ -1,4 +1,5 @@
 # Speeck-Driven-Facial-Animation
+Developed by Fengru Li, Xiaoyi Tang, Fei Tao, Ke Xu
 ## Motivation
 Nonverbal behaviour signals, such as facial expressions, provide key information about what we think, act or react. It is an attractive but also challenging to study the signals because they are always hidden or may vary from different people. In this project, we are trying to use machine learning methods for modelling human facial expressions. Therefore, we can get a framework which enables us to predict the facial expression of a never-seen-person when we only hear that person speak.
 ## Technical details
